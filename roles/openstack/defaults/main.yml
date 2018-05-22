@@ -1,0 +1,5 @@
+---
+# defaults file for openstack
+pass: 'secret'
+host_ip: '192.168.0.206'
+ip_pool: '192.168.0.220/27'

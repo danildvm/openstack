@@ -1,0 +1,56 @@
+---
+# tasks file for openstack
+# - name: Create folder '/opt/stack'
+#   file:
+#     path: /opt/stack
+#     state: directory
+
+- name: clone git repos
+  git:
+    repo: 'https://github.com/openstack-dev/devstack.git'
+    dest: /opt/stack/devstack
+    version: stable/queens
+
+- name: Create file local.conf
+  blockinfile:
+    path: /opt/stack/devstack/local.conf
+    create: yes
+    block: |
+      [[local|localrc]]
+      ADMIN_PASSWORD={{ pass }}
+      DATABASE_PASSWORD=\$ADMIN_PASSWORD
+      RABBIT_PASSWORD=\$ADMIN_PASSWORD
+      SERVICE_PASSWORD=\$ADMIN_PASSWORD
+      HOST_IP={{ host_ip }}
+      enable_service s-proxy s-object s-container s-account
+      SWIFT_REPLICAS=1
+      SWIFT_HASH=66a3d6b56c1f479c8b4e70ab5c2000f5
+      enable_service h-eng h-api h-api-cfn h-api-cw
+      enable_plugin heat git://git.openstack.org/openstack/heat
+      FLOATING_RANGE={{ ip_pool }}
+      FLAT_INTERFACE=enp0s8
+
+- name: Create file local.conf
+  blockinfile:
+    path: /opt/stack/devstack/.localrc.auto
+    create: yes
+    block: |
+      ADMIN_PASSWORD={{ pass }}
+      DATABASE_PASSWORD=\$ADMIN_PASSWORD
+      RABBIT_PASSWORD=\$ADMIN_PASSWORD
+      SERVICE_PASSWORD=\$ADMIN_PASSWORD
+      HOST_IP={{ host_ip }}
+      enable_service s-proxy s-object s-container s-account
+      SWIFT_REPLICAS=1
+      SWIFT_HASH=66a3d6b56c1f479c8b4e70ab5c2000f5
+      enable_service h-eng h-api h-api-cfn h-api-cw
+      enable_plugin heat git://git.openstack.org/openstack/heat
+      FLOATING_RANGE={{ ip_pool }}
+      FLAT_INTERFACE=enp0s8
+
+- name: Add stack user
+  command: /opt/stack/devstack/tools/create-stack-user.sh
+
+- name: Run stack.sh
+  command: /opt/stack/devstack/stack.sh
+  become_user: stack

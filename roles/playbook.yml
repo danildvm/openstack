@@ -1,0 +1,8 @@
+---
+- hosts: vm
+  remote_user: vagrant
+  become: yes
+  environment:
+    PYTHONPATH: "{{ lookup('env','PYTHONPATH') }}:/usr/local/lib/python3.5/dist-packages:/usr/local/lib/python3.5/site-packages"
+  roles:
+    - openstack
